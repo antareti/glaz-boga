@@ -1168,18 +1168,15 @@
       const cfg = SEARCH_CONFIG[typeKey];
       currentType = typeKey;
 
-      // переключение активной кнопки
       typeButtons.forEach((btn) => {
         const t = btn.getAttribute("data-type");
         btn.classList.toggle("active", t === typeKey);
       });
 
-      // обновляем чип, плейсхолдер и подсказку
       typeChip.textContent = cfg.icon;
       queryInput.placeholder = cfg.placeholder;
       placeholderHint.textContent = cfg.hint;
 
-      // перечень источников
       checkList.innerHTML = "";
       cfg.sources.forEach((src, idx) => {
         const span = document.createElement("span");
@@ -1254,14 +1251,54 @@
       `;
     }
 
+    // Рандомный профиль в новом окне
     function openProfileWindowInto(win, query) {
-      if (!win) return; // если попап заблокирован
+      if (!win) return;
+
+      const names = [
+        "Алексей Коргин", "Илья Долидзе", "Давид Микадзе", "Вахтанг Капанадзе",
+        "Темур Джанелидзе", "Георгий Нармания", "Михаил Арабули", "Зураб Окриашвили",
+        "Леван Гогелия", "Нодар Чихладзе", "Резо Квирикашвили", "Тенгиз Стуруа"
+      ];
+
+      const cities = [
+        "Тбилиси", "Батуми", "Кутаиси", "Зугдиди", "Гори", "Поти",
+        "Телави", "Марнеули", "Ахалкалаки", "Мцхета"
+      ];
+
+      const countries = ["Грузия", "Армения", "Азербайджан", "Россия", "Турция"];
+
+      const streets = [
+        "ул. Руставели",
+        "пр. Агмашенебели",
+        "ул. Церетели",
+        "ул. Чавчавадзе",
+        "ул. Абашидзе",
+        "ул. Костава",
+        "ул. Дадиани",
+        "ул. Горгасали",
+        "ул. Вардани",
+        "ул. Инасаридзе"
+      ];
+
+      const photos = [
+        "https://i.imgur.com/7J4Qd0C.jpeg",
+        "https://i.imgur.com/UD1pTQ6.jpeg",
+        "https://i.imgur.com/syYpuiB.jpeg",
+        "https://i.imgur.com/FB4H1kR.jpeg",
+        "https://i.imgur.com/O7x6U7c.jpeg"
+      ];
+
+      function rand(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
       const fakeProfile = {
-        name: "Николай Габуния",
-        city: "Тбилиси",
-        country: "Грузия",
-        address: "ул. Руставели, район Вера (примерно)",
-        photo: "https://i.imgur.com/3VQbG4Q.jpeg"
+        name: rand(names),
+        city: rand(cities),
+        country: rand(countries),
+        address: `${rand(streets)}, район ${Math.floor(Math.random() * 20) + 1}`,
+        photo: rand(photos)
       };
 
       win.document.open();
@@ -1354,7 +1391,6 @@
         return;
       }
 
-      // открываем окно сразу, чтобы браузер не заблокировал
       const profileWin = window.open("", "_blank", "width=520,height=700");
 
       isLoading = true;
@@ -1373,7 +1409,6 @@
       }, 900);
     }
 
-    // Слушатели
     typeButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         const t = btn.getAttribute("data-type");
@@ -1391,7 +1426,6 @@
       }
     });
 
-    // Стартовое состояние
     renderType("phone");
     showEmpty();
   </script>
