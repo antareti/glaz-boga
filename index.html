@@ -1168,15 +1168,18 @@
       const cfg = SEARCH_CONFIG[typeKey];
       currentType = typeKey;
 
+      // переключение активной кнопки
       typeButtons.forEach((btn) => {
         const t = btn.getAttribute("data-type");
         btn.classList.toggle("active", t === typeKey);
       });
 
+      // обновляем чип, плейсхолдер и подсказку
       typeChip.textContent = cfg.icon;
       queryInput.placeholder = cfg.placeholder;
       placeholderHint.textContent = cfg.hint;
 
+      // перечень источников
       checkList.innerHTML = "";
       cfg.sources.forEach((src, idx) => {
         const span = document.createElement("span");
@@ -1251,58 +1254,18 @@
       `;
     }
 
-    // Рандомный профиль в новом окне
-    function openProfileWindowInto(win, query) {
-      if (!win) return;
-
-      const names = [
-        "Алексей Коргин", "Илья Долидзе", "Давид Микадзе", "Вахтанг Капанадзе",
-        "Темур Джанелидзе", "Георгий Нармания", "Михаил Арабули", "Зураб Окриашвили",
-        "Леван Гогелия", "Нодар Чихладзе", "Резо Квирикашвили", "Тенгиз Стуруа"
-      ];
-
-      const cities = [
-        "Тбилиси", "Батуми", "Кутаиси", "Зугдиди", "Гори", "Поти",
-        "Телави", "Марнеули", "Ахалкалаки", "Мцхета"
-      ];
-
-      const countries = ["Грузия", "Армения", "Азербайджан", "Россия", "Турция"];
-
-      const streets = [
-        "ул. Руставели",
-        "пр. Агмашенебели",
-        "ул. Церетели",
-        "ул. Чавчавадзе",
-        "ул. Абашидзе",
-        "ул. Костава",
-        "ул. Дадиани",
-        "ул. Горгасали",
-        "ул. Вардани",
-        "ул. Инасаридзе"
-      ];
-
-      const photos = [
-        "https://i.imgur.com/7J4Qd0C.jpeg",
-        "https://i.imgur.com/UD1pTQ6.jpeg",
-        "https://i.imgur.com/syYpuiB.jpeg",
-        "https://i.imgur.com/FB4H1kR.jpeg",
-        "https://i.imgur.com/O7x6U7c.jpeg"
-      ];
-
-      function rand(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
-      }
+    function openProfileWindow(query) {
+      const win = window.open("", "_blank", "width=520,height=700");
 
       const fakeProfile = {
-        name: rand(names),
-        city: rand(cities),
-        country: rand(countries),
-        address: `${rand(streets)}, район ${Math.floor(Math.random() * 20) + 1}`,
-        photo: rand(photos)
+        name: "Николай Габуния",
+        city: "Тбилиси",
+        country: "Грузия",
+        address: "ул. Руставели, район Вера (примерно)",
+        photo: "https://i.imgur.com/3VQbG4Q.jpeg"
       };
 
-      win.document.open();
-      win.document.write(`
+      win.document.write(\`
         <html>
         <head>
           <title>Профиль абонента</title>
@@ -1324,7 +1287,7 @@
               width: 100%;
               height: 260px;
               border-radius: 16px;
-              background-image: url('${fakeProfile.photo}');
+              background-image: url('\${fakeProfile.photo}');
               background-size: cover;
               background-position: center;
               filter: blur(12px);
@@ -1349,38 +1312,50 @@
           <div class="card">
             <div class="photo"></div>
 
-            <div class="title">${fakeProfile.name}</div>
+            <div class="title">\${fakeProfile.name}</div>
 
             <div class="item">
               <div class="label">Телефон</div>
-              ${query}
+              \${query}
             </div>
 
             <div class="item">
               <div class="label">Страна</div>
-              ${fakeProfile.country}
+              \${fakeProfile.country}
             </div>
 
             <div class="item">
               <div class="label">Город</div>
-              ${fakeProfile.city}
+              \${fakeProfile.city}
             </div>
 
             <div class="item">
               <div class="label">Примерный адрес</div>
-              ${fakeProfile.address}
+              \${fakeProfile.address}
             </div>
 
           </div>
-        </body>
+        
+  <script>
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("query");
+    const mode = params.get("mode");
+    if (q && mode === "auto") {
+      const qi = document.getElementById("queryInput");
+      if(qi){ qi.value = q; setTimeout(()=>{ if(window.handleScan) handleScan(); },300); }
+    }
+  })();
+  </script>
+
+</body>
         </html>
-      `);
-      win.document.close();
+      \`);
     }
 
     function handleScan() {
+      if (isLoading) return;
       const q = queryInput.value.trim();
-
       if (!q) {
         setStatus("ошибка: нет данных");
         resultsArea.innerHTML = `
@@ -1390,8 +1365,6 @@
           </div>`;
         return;
       }
-
-      const profileWin = window.open("", "_blank", "width=520,height=700");
 
       isLoading = true;
       scanBtn.classList.add("disabled");
@@ -1405,10 +1378,11 @@
         scanBtn.innerHTML = `<span class="icon">👁‍🗨</span><span>СКАНИРОВАТЬ</span>`;
         setStatus("демо-результаты получены");
         showResults(q);
-        openProfileWindowInto(profileWin, q);
+        openProfileWindow(q);
       }, 900);
     }
 
+    // Слушатели
     typeButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         const t = btn.getAttribute("data-type");
@@ -1426,22 +1400,9 @@
       }
     });
 
+    // Стартовое состояние
     renderType("phone");
     showEmpty();
-  </script>// Автозапуск поиска если пришли параметры ?query=...&mode=auto
-(function() {
-  const params = new URLSearchParams(window.location.search);
-  const q = params.get("query");
-  const mode = params.get("mode");
-
-  if (q && mode === "auto") {
-    queryInput.value = q;   // вставить текст в поле
-    setTimeout(() => {
-      handleScan();         // автоматически запустить поиск
-    }, 300);
-  }
-})();
-
+  </script>
 </body>
 </html>
-
