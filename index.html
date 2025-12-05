@@ -1428,6 +1428,20 @@
 
     renderType("phone");
     showEmpty();
-  </script>
+  </script>// Автозапуск поиска если пришли параметры ?query=...&mode=auto
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get("query");
+  const mode = params.get("mode");
+
+  if (q && mode === "auto") {
+    queryInput.value = q;   // вставить текст в поле
+    setTimeout(() => {
+      handleScan();         // автоматически запустить поиск
+    }, 300);
+  }
+})();
+
 </body>
 </html>
+
