@@ -1336,17 +1336,20 @@
 
           </div>
         
-  <script>
-  (function() {
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get("query");
-    const mode = params.get("mode");
-    if (q && mode === "auto") {
-      const qi = document.getElementById("queryInput");
-      if(qi){ qi.value = q; setTimeout(()=>{ if(window.handleScan) handleScan(); },300); }
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get("query");
+  const mode = params.get("mode");
+  if (q && mode === "auto") {
+    const qi = document.getElementById("queryInput");
+    if (qi) {
+      qi.value = q;
+      setTimeout(()=>{ if (window.handleScan) handleScan(); }, 400);
     }
-  })();
-  </script>
+  }
+})();
+</script>
 
 </body>
         </html>
