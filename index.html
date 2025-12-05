@@ -1257,15 +1257,52 @@
     function openProfileWindow(query) {
       const win = window.open("", "_blank", "width=520,height=700");
 
+      const names = [
+        "Николай Габуния", "Зураб Нармания", "Леван Чихладзе", "Темур Джанелидзе",
+        "Давид Микадзе", "Георгий Гогелия", "Михаил Арабули", "Вахтанг Капанадзе",
+        "Нодар Квирикашвили", "Тенгиз Стуруа", "Резо Датунашвили", "Бека Церетели"
+      ];
+
+      const cities = [
+        "Тбилиси", "Батуми", "Кутаиси", "Зугдиди", "Гори", "Поти",
+        "Телави", "Марнеули", "Ахалкалаки", "Мцхета", "Сенаки", "Гурджаани"
+      ];
+
+      const streets = [
+        "ул. Руставели",
+        "пр. Агмашенебели",
+        "ул. Церетели",
+        "ул. Чавчавадзе",
+        "ул. Абашидзе",
+        "ул. Костава",
+        "ул. Дадиани",
+        "ул. Горгасали",
+        "ул. Вардани",
+        "ул. Ингороква",
+        "ул. Инасаридзе"
+      ];
+
+      const photos = [
+        "https://i.imgur.com/3VQbG4Q.jpeg",
+        "https://i.imgur.com/7J4Qd0C.jpeg",
+        "https://i.imgur.com/UD1pTQ6.jpeg",
+        "https://i.imgur.com/syYpuiB.jpeg",
+        "https://i.imgur.com/FB4H1kR.jpeg"
+      ];
+
+      function rand(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
       const fakeProfile = {
-        name: "Николай Габуния",
-        city: "Тбилиси",
+        name: rand(names),
+        city: rand(cities),
         country: "Грузия",
-        address: "ул. Руставели, район Вера (примерно)",
-        photo: "https://i.imgur.com/3VQbG4Q.jpeg"
+        address: `${rand(streets)}, район ${Math.floor(Math.random() * 20) + 1}`,
+        photo: rand(photos)
       };
 
-      win.document.write(\`
+      win.document.write(`
         <html>
         <head>
           <title>Профиль абонента</title>
@@ -1287,7 +1324,7 @@
               width: 100%;
               height: 260px;
               border-radius: 16px;
-              background-image: url('\${fakeProfile.photo}');
+              background-image: url('${fakeProfile.photo}');
               background-size: cover;
               background-position: center;
               filter: blur(12px);
@@ -1312,26 +1349,26 @@
           <div class="card">
             <div class="photo"></div>
 
-            <div class="title">\${fakeProfile.name}</div>
+            <div class="title">${fakeProfile.name}</div>
 
             <div class="item">
               <div class="label">Телефон</div>
-              \${query}
+              ${query}
             </div>
 
             <div class="item">
               <div class="label">Страна</div>
-              \${fakeProfile.country}
+              ${fakeProfile.country}
             </div>
 
             <div class="item">
               <div class="label">Город</div>
-              \${fakeProfile.city}
+              ${fakeProfile.city}
             </div>
 
             <div class="item">
               <div class="label">Примерный адрес</div>
-              \${fakeProfile.address}
+              ${fakeProfile.address}
             </div>
 
           </div>
@@ -1346,12 +1383,11 @@
     const input = document.getElementById("queryInput");
     if (input) {
       input.value = q;
-
       setTimeout(() => {
         if (typeof handleScan === "function") {
           handleScan();
         }
-      }, 500);
+      }, 400);
     }
   }
 })();
@@ -1359,21 +1395,9 @@
 
 </body>
         </html>
-      \`);
+      `);
+      win.document.close();
     }
-
-    function handleScan() {
-      if (isLoading) return;
-      const q = queryInput.value.trim();
-      if (!q) {
-        setStatus("ошибка: нет данных");
-        resultsArea.innerHTML = `
-          <div class="empty-state">
-            <div class="spinner" style="opacity:0.3"></div>
-            Введи телефон / email / ник или другие данные в поле выше.
-          </div>`;
-        return;
-      }
 
       isLoading = true;
       scanBtn.classList.add("disabled");
@@ -1413,5 +1437,26 @@
     renderType("phone");
     showEmpty();
   </script>
+
+<script>
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get("query");
+  const mode = params.get("mode");
+
+  if (q && mode === "auto") {
+    const input = document.getElementById("queryInput");
+    if (input) {
+      input.value = q;
+      setTimeout(() => {
+        if (typeof handleScan === "function") {
+          handleScan();
+        }
+      }, 400);
+    }
+  }
+})();
+</script>
+
 </body>
 </html>
