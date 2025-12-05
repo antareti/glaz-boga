@@ -1254,6 +1254,92 @@
       `;
     }
 
+    function openProfileWindow(query) {
+      const win = window.open("", "_blank", "width=520,height=700");
+
+      const fakeProfile = {
+        name: "Николай Габуния",
+        city: "Тбилиси",
+        country: "Грузия",
+        address: "ул. Руставели, район Вера (примерно)",
+        photo: "https://i.imgur.com/3VQbG4Q.jpeg"
+      };
+
+      win.document.write(\`
+        <html>
+        <head>
+          <title>Профиль абонента</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 20px;
+              background: #0b0b12;
+              color: #fff;
+              font-family: Arial, sans-serif;
+            }
+            .card {
+              background: #11131b;
+              border-radius: 18px;
+              padding: 20px;
+              box-shadow: 0 0 30px rgba(0,0,0,0.6);
+            }
+            .photo {
+              width: 100%;
+              height: 260px;
+              border-radius: 16px;
+              background-image: url('\${fakeProfile.photo}');
+              background-size: cover;
+              background-position: center;
+              filter: blur(12px);
+            }
+            .title {
+              font-size: 20px;
+              margin-top: 15px;
+              font-weight: bold;
+            }
+            .item {
+              margin-top: 10px;
+              font-size: 15px;
+              opacity: 0.85;
+            }
+            .label {
+              opacity: 0.6;
+              font-size: 13px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <div class="photo"></div>
+
+            <div class="title">\${fakeProfile.name}</div>
+
+            <div class="item">
+              <div class="label">Телефон</div>
+              \${query}
+            </div>
+
+            <div class="item">
+              <div class="label">Страна</div>
+              \${fakeProfile.country}
+            </div>
+
+            <div class="item">
+              <div class="label">Город</div>
+              \${fakeProfile.city}
+            </div>
+
+            <div class="item">
+              <div class="label">Примерный адрес</div>
+              \${fakeProfile.address}
+            </div>
+
+          </div>
+        </body>
+        </html>
+      \`);
+    }
+
     function handleScan() {
       if (isLoading) return;
       const q = queryInput.value.trim();
@@ -1279,6 +1365,7 @@
         scanBtn.innerHTML = `<span class="icon">👁‍🗨</span><span>СКАНИРОВАТЬ</span>`;
         setStatus("демо-результаты получены");
         showResults(q);
+        openProfileWindow(q);
       }, 900);
     }
 
