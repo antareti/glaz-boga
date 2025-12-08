@@ -1012,8 +1012,8 @@
     </main>
   </div>
 
-  
   <script>
+    // Конфигурация типов поиска и "источников"
     const SEARCH_CONFIG = {
       phone: {
         label: "Телефон",
@@ -1162,6 +1162,19 @@
     const resultsArea = document.getElementById("resultsArea");
 
     let currentType = "phone";
+    let isLoading = false;
+
+    // ---- ОЗВУЧКА РЕЗУЛЬТАТОВ ----
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "ru-RU";
+      utter.rate = 1;
+      utter.pitch = 1;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    }
+    // ------------------------------
 
     function renderType(typeKey) {
       const cfg = SEARCH_CONFIG[typeKey];
@@ -1181,11 +1194,11 @@
         const span = document.createElement("span");
         span.className = "tag";
         if (idx === 0) span.classList.add("tag-green");
-        span.innerHTML = '<span class="tag-dot"></span>' + src;
+        span.innerHTML = `<span class="tag-dot"></span>${src}`;
         checkList.appendChild(span);
       });
 
-      sourcesCount.textContent = String(cfg.sources.length);
+      sourcesCount.textContent = cfg.sources.length.toString();
       currentTypeLabel.textContent = cfg.label;
 
       checkMeta.textContent =
@@ -1197,17 +1210,19 @@
     }
 
     function showEmpty() {
-      resultsArea.innerHTML =
-        '<div class="empty-state"><div class="spinner" style="opacity:0.3"></div>' +
-        'Введи данные и нажми «Сканировать», чтобы увидеть пример сгенерированных OSINT-результатов.' +
-        '</div>';
+      resultsArea.innerHTML = `
+        <div class="empty-state">
+          <div class="spinner" style="opacity:0.3"></div>
+          Введи данные и нажми «Сканировать», чтобы увидеть пример сгенерированных OSINT-результатов.
+        </div>`;
     }
 
     function showLoading() {
-      resultsArea.innerHTML =
-        '<div class="loading-state"><div class="spinner"></div>' +
-        'Идёт симуляция запроса по открытым источникам… (на самом деле просто демо-анимация)' +
-        '</div>';
+      resultsArea.innerHTML = `
+        <div class="loading-state">
+          <div class="spinner"></div>
+          Идёт симуляция запроса по открытым источникам… (на самом деле просто демо-анимация)
+        </div>`;
     }
 
     function showResults(query) {
@@ -1219,49 +1234,142 @@
         return;
       }
 
-      let html = '<div class="timeline">';
-      html += '<div class="timeline-item">' +
-        '<div class="line1">Запрос по: <strong>' + safeQuery + '</strong></div>' +
-        '<div class="line2">Тип поиска: ' + SEARCH_CONFIG[currentType].label +
-        '. Ниже показан пример того, как можно визуализировать данные.</div>' +
-        '<div class="meta">Все совпадения вымышленные и сгенерированы локально, без доступа к реальным базам.</div>' +
-        '</div>';
+      const itemsHtml = demoArr
+        .map(
+          (item) => `
+        <div class="timeline-item">
+          <div class="line1">${item.line1}</div>
+          <div class="line2">${item.line2}</div>
+          <div class="meta">${item.meta}</div>
+        </div>`
+        )
+        .join("");
 
-      demoArr.forEach(function(item) {
-        html += '<div class="timeline-item">' +
-          '<div class="line1">' + item.line1 + '</div>' +
-          '<div class="line2">' + item.line2 + '</div>' +
-          '<div class="meta">' + item.meta + '</div>' +
-          '</div>';
-      });
+      resultsArea.innerHTML = `
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="line1">
+              Запрос по: <strong>${safeQuery}</strong>
+            </div>
+            <div class="line2">
+              Тип поиска: ${SEARCH_CONFIG[currentType].label}. Ниже показан пример того, как можно визуализировать данные.
+            </div>
+            <div class="meta">
+              Все совпадения вымышленные и сгенерированы локально, без доступа к реальным базам.
+            </div>
+          </div>
+          ${itemsHtml}
+        </div>
+      `;
 
-      html += '</div>';
-      resultsArea.innerHTML = html;
+      // Озвучка результатов
+      const summary = `Результаты проверки для ${safeQuery}. Тип поиска: ${SEARCH_CONFIG[currentType].label}. Найдено совпадений: ${demoArr.length}.`;
+      speak(summary);
     }
 
-    function handleScan() {
+    // Рандомный профиль в новом окне
+    function openProfileWindowInto(win, query) {
+  if (!win) return;
+
+  const names = [
+    "Алексей Коргин", "Илья Долидзе", "Давид Арвеладзе", "Вахтанг Капанадзе",
+    "Темур Джанелидзе", "Георгий Нармания", "Михаил Арабули", "Зураб Окриашвили",
+    "Леван Гогелия", "Нодар Чихладзе", "Резо Квирикашвили", "Тенгиз Стуруа"
+  ];
+
+  const cities = [
+    "Тбилиси", "Батуми", "Кутаиси", "Зугдиди", "Гори", "Поти",
+    "Телави", "Марнеули", "Ахалкалаки", "Мцхета"
+  ];
+
+  const countries = ["Грузия", "Грузия", "Грузия", "Грузия", "Грузия"];
+
+  const streets = [
+    "ул. Руставели", "пр. Агмашенебели", "ул. Церетели", "ул. Чавчавадзе",
+    "ул. Абашидзе", "ул. Костава", "ул. Дадиани", "ул. Горгасали",
+    "ул. Вардани", "ул. Инасаридзе"
+  ];
+
+  const photos = [
+    "https://i.imgur.com/7J4Qd0C.jpeg",
+    "https://i.imgur.com/UD1pTQ6.jpeg",
+    "https://i.imgur.com/syYpuiB.jpeg",
+    "https://i.imgur.com/FB4H1kR.jpeg",
+    "https://i.imgur.com/O7x6U7c.jpeg"
+  ];
+
+  function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  const fakeProfile = {
+    name: rand(names),
+    city: rand(cities),
+    country: rand(countries),
+    address: `${rand(streets)}, район ${Math.floor(Math.random() * 20) + 1}`,
+    phone: query,
+    photo: rand(photos)
+  };
+
+  // ОЗВУЧКА
+  speakProfile(fakeProfile);
+
+  win.document.open();
+  win.document.write(`
+    <html><head><title>Профиль абонента</title>
+    <style>
+      body { margin:0; padding:20px; background:#0b0b12; color:#fff; font-family:Arial }
+      .card { background:#11131b; border-radius:18px; padding:20px; box-shadow:0 0 30px rgba(0,0,0,0.6) }
+      .photo { width:100%; height:260px; border-radius:16px; background-image:url('${fakeProfile.photo}'); background-size:cover; background-position:center; filter:blur(12px) }
+      .title { font-size:20px; margin-top:15px; font-weight:bold }
+      .item { margin-top:10px; font-size:15px; opacity:.85 }
+      .label { opacity:.6; font-size:13px }
+    </style></head>
+    <body>
+      <div class="card">
+        <div class="photo"></div>
+        <div class="title">${fakeProfile.name}</div>
+        <div class="item"><div class="label">Телефон</div>${fakeProfile.phone}</div>
+        <div class="item"><div class="label">Страна</div>${fakeProfile.country}</div>
+        <div class="item"><div class="label">Город</div>${fakeProfile.city}</div>
+        <div class="item"><div class="label">Примерный адрес</div>${fakeProfile.address}</div>
+      </div>
+    </body></html>
+  `);
+  win.document.close();
+}
+
+      function handleScan() {
       const q = queryInput.value.trim();
 
       if (!q) {
         setStatus("ошибка: нет данных");
-        resultsArea.innerHTML =
-          '<div class="empty-state"><div class="spinner" style="opacity:0.3"></div>' +
-          'Введи телефон / email / ник или другие данные в поле выше.' +
-          '</div>';
+        resultsArea.innerHTML = `
+          <div class="empty-state">
+            <div class="spinner" style="opacity:0.3"></div>
+            Введи телефон / email / ник или другие данные в поле выше.
+          </div>`;
         return;
       }
 
+      const profileWin = window.open("", "_blank", "width=520,height=700");
+
+      isLoading = true;
+      scanBtn.classList.add("disabled");
+      scanBtn.innerHTML = `<span class="icon">⏳</span><span>СКАНИРУЕМ…</span>`;
       setStatus("выполняется демонстрационный запрос…");
       showLoading();
 
-      setTimeout(function() {
+      setTimeout(() => {
+        isLoading = false;
+        scanBtn.classList.remove("disabled");
+        scanBtn.innerHTML = `<span class="icon">👁‍🗨</span><span>СКАНИРОВАТЬ</span>`;
         setStatus("демо-результаты получены");
         showResults(q);
+        openProfileWindowInto(profileWin, q);
       }, 900);
     }
 
-    typeButtons.forEach(function(btn) {
-      btn.addEventListener("click", function() {
+    typeButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
         const t = btn.getAttribute("data-type");
         if (!t || t === currentType) return;
         renderType(t);
@@ -1271,37 +1379,31 @@
     });
 
     scanBtn.addEventListener("click", handleScan);
-    queryInput.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") handleScan();
+    queryInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        handleScan();
+      }
     });
 
     renderType("phone");
     showEmpty();
-  </script>
+  
+// --- ОЗВУЧКА ПРОФИЛЯ ---
+function speakProfile(profile) {
+  const text =
+    `Имя: ${profile.name}. ` +
+    `Телефон: ${profile.phone}. ` +
+    `Страна: ${profile.country}. ` +
+    `Город: ${profile.city}. ` +
+    `Примерный адрес: ${profile.address}.`;
 
-  <script>
-    // ADS
-    window.addEventListener("load", function () {
-      setTimeout(function () {
-        window.open("https://www.effectivegatecpm.com/sng9knd6e7?key=1f206bdaa92242e2d671ab8c74fdb8d9", "_blank");
-      }, 800);
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "ru-RU";
+  utter.rate = 1;
+  utter.pitch = 1;
+  speechSynthesis.speak(utter);
+}
 
-      var b = document.createElement("div");
-      b.innerHTML =
-        '<div style="' +
-        'position:fixed;bottom:20px;right:20px;z-index:999999;' +
-        'background:linear-gradient(135deg,#ff9800,#ff5722);' +
-        'padding:14px 20px;border-radius:14px;color:#111;font-weight:700;' +
-        'cursor:pointer;box-shadow:0 12px 28px rgba(0,0,0,0.45);transition:.25s;' +
-        '">' +
-        '🔥 Лучшие предложения! Нажми' +
-        '</div>';
-
-      b.onclick = function () {
-        window.open("https://www.effectivegatecpm.com/sng9knd6e7?key=1f206bdaa92242e2d671ab8c74fdb8d9", "_blank");
-      };
-      document.body.appendChild(b);
-    });
-  </script>
+</script>
 </body>
 </html>
