@@ -1164,6 +1164,18 @@
     let currentType = "phone";
     let isLoading = false;
 
+    // ---- ОЗВУЧКА РЕЗУЛЬТАТОВ ----
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "ru-RU";
+      utter.rate = 1;
+      utter.pitch = 1;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    }
+    // ------------------------------
+
     function renderType(typeKey) {
       const cfg = SEARCH_CONFIG[typeKey];
       currentType = typeKey;
@@ -1249,6 +1261,10 @@
           ${itemsHtml}
         </div>
       `;
+
+      // Озвучка результатов
+      const summary = `Результаты проверки для ${safeQuery}. Тип поиска: ${SEARCH_CONFIG[currentType].label}. Найдено совпадений: ${demoArr.length}. Все данные вымышленные и используются только для демонстрации.`;
+      speak(summary);
     }
 
     // Рандомный профиль в новом окне
