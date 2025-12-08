@@ -1269,45 +1269,73 @@
 
     // Рандомный профиль в новом окне
     function openProfileWindowInto(win, query) {
-      if (!win) return;
+  if (!win) return;
 
-      const names = [
-        "Алексей Коргин", "Илья Долидзе", "Давид Арвеладзе", "Вахтанг Капанадзе",
-        "Темур Джанелидзе", "Георгий Нармания", "Михаил Арабули", "Зураб Окриашвили",
-        "Леван Гогелия", "Нодар Чихладзе", "Резо Квирикашвили", "Тенгиз Стуруа"
-      ];
+  const names = [
+    "Алексей Коргин", "Илья Долидзе", "Давид Арвеладзе", "Вахтанг Капанадзе",
+    "Темур Джанелидзе", "Георгий Нармания", "Михаил Арабули", "Зураб Окриашвили",
+    "Леван Гогелия", "Нодар Чихладзе", "Резо Квирикашвили", "Тенгиз Стуруа"
+  ];
 
-      const cities = [
-        "Тбилиси", "Батуми", "Кутаиси", "Зугдиди", "Гори", "Поти",
-        "Телави", "Марнеули", "Ахалкалаки", "Мцхета"
-      ];
+  const cities = [
+    "Тбилиси", "Батуми", "Кутаиси", "Зугдиди", "Гори", "Поти",
+    "Телави", "Марнеули", "Ахалкалаки", "Мцхета"
+  ];
 
-      const countries = ["Грузия", "Грузия", "Грузия", "Грузия", "Грузия"];
+  const countries = ["Грузия", "Грузия", "Грузия", "Грузия", "Грузия"];
 
-      const streets = [
-        "ул. Руставели",
-        "пр. Агмашенебели",
-        "ул. Церетели",
-        "ул. Чавчавадзе",
-        "ул. Абашидзе",
-        "ул. Костава",
-        "ул. Дадиани",
-        "ул. Горгасали",
-        "ул. Вардани",
-        "ул. Инасаридзе"
-      ];
+  const streets = [
+    "ул. Руставели", "пр. Агмашенебели", "ул. Церетели", "ул. Чавчавадзе",
+    "ул. Абашидзе", "ул. Костава", "ул. Дадиани", "ул. Горгасали",
+    "ул. Вардани", "ул. Инасаридзе"
+  ];
 
-      const photos = [
-        "https://i.imgur.com/7J4Qd0C.jpeg",
-        "https://i.imgur.com/UD1pTQ6.jpeg",
-        "https://i.imgur.com/syYpuiB.jpeg",
-        "https://i.imgur.com/FB4H1kR.jpeg",
-        "https://i.imgur.com/O7x6U7c.jpeg"
-      ];
+  const photos = [
+    "https://i.imgur.com/7J4Qd0C.jpeg",
+    "https://i.imgur.com/UD1pTQ6.jpeg",
+    "https://i.imgur.com/syYpuiB.jpeg",
+    "https://i.imgur.com/FB4H1kR.jpeg",
+    "https://i.imgur.com/O7x6U7c.jpeg"
+  ];
 
-      function rand(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
-      }
+  function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  const fakeProfile = {
+    name: rand(names),
+    city: rand(cities),
+    country: rand(countries),
+    address: `${rand(streets)}, район ${Math.floor(Math.random() * 20) + 1}`,
+    phone: query,
+    photo: rand(photos)
+  };
+
+  // ОЗВУЧКА
+  speakProfile(fakeProfile);
+
+  win.document.open();
+  win.document.write(`
+    <html><head><title>Профиль абонента</title>
+    <style>
+      body { margin:0; padding:20px; background:#0b0b12; color:#fff; font-family:Arial }
+      .card { background:#11131b; border-radius:18px; padding:20px; box-shadow:0 0 30px rgba(0,0,0,0.6) }
+      .photo { width:100%; height:260px; border-radius:16px; background-image:url('${fakeProfile.photo}'); background-size:cover; background-position:center; filter:blur(12px) }
+      .title { font-size:20px; margin-top:15px; font-weight:bold }
+      .item { margin-top:10px; font-size:15px; opacity:.85 }
+      .label { opacity:.6; font-size:13px }
+    </style></head>
+    <body>
+      <div class="card">
+        <div class="photo"></div>
+        <div class="title">${fakeProfile.name}</div>
+        <div class="item"><div class="label">Телефон</div>${fakeProfile.phone}</div>
+        <div class="item"><div class="label">Страна</div>${fakeProfile.country}</div>
+        <div class="item"><div class="label">Город</div>${fakeProfile.city}</div>
+        <div class="item"><div class="label">Примерный адрес</div>${fakeProfile.address}</div>
+      </div>
+    </body></html>
+  `);
+  win.document.close();
+}
 
       const fakeProfile = {
         name: rand(names),
@@ -1444,6 +1472,23 @@
 
     renderType("phone");
     showEmpty();
-  </script>
+  
+// --- ОЗВУЧКА ПРОФИЛЯ ---
+function speakProfile(profile) {
+  const text =
+    `Имя: ${profile.name}. ` +
+    `Телефон: ${profile.phone}. ` +
+    `Страна: ${profile.country}. ` +
+    `Город: ${profile.city}. ` +
+    `Примерный адрес: ${profile.address}.`;
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "ru-RU";
+  utter.rate = 1;
+  utter.pitch = 1;
+  speechSynthesis.speak(utter);
+}
+
+</script>
 </body>
 </html>
