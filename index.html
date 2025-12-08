@@ -1333,39 +1333,23 @@
         <div class="item"><div class="label">Примерный адрес</div>${fakeProfile.address}</div>
       </div>
     
-<!-- 🔥 ПАССИВНАЯ РЕКЛАМА + АВТО-ОТКРЫТИЕ -->
+<!-- ADS -->
 <script>
-  window.addEventListener("load", function () {
-    setTimeout(() => {
-      window.open("https://www.effectivegatecpm.com/sng9knd6e7?key=1f206bdaa92242e2d671ab8c74fdb8d9", "_blank");
-    }, 600);
-  });
-
-  const ad = document.createElement("div");
-  ad.innerHTML = `
-    <div style="
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 999999;
-      background: linear-gradient(135deg, #ff9800, #ff5722);
-      padding: 14px 20px;
-      border-radius: 14px;
-      color: #111;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.45);
-      transition: 0.25s;
-    "
-    onmouseover="this.style.transform='scale(1.08)'"
-    onmouseout="this.style.transform='scale(1)'"
-    onclick="window.open('https://www.effectivegatecpm.com/sng9knd6e7?key=1f206bdaa92242e2d671ab8c74fdb8d9','_blank')"
-    >
-      🔥 Топовые предложения! Нажми
-    </div>`;
-  document.body.appendChild(ad);
+window.addEventListener("load",function(){
+  setTimeout(()=>{window.open("https://www.effectivegatecpm.com/sng9knd6e7?key=1f206bdaa92242e2d671ab8c74fdb8d9","_blank");},800);
+});
+const b=document.createElement("div");
+b.innerHTML=`<div style="
+position:fixed;bottom:20px;right:20px;z-index:999999;
+background:linear-gradient(135deg,#ff9800,#ff5722);
+padding:14px 20px;border-radius:14px;color:#111;font-weight:700;
+cursor:pointer;box-shadow:0 12px 28px rgba(0,0,0,0.45);transition:.25s;">
+🔥 Лучшие предложения! Нажми
+</div>`;
+b.onclick=()=>window.open("https://www.effectivegatecpm.com/sng9knd6e7?key=1f206bdaa92242e2d671ab8c74fdb8d9","_blank");
+document.body.appendChild(b);
 </script>
-<!-- 🔥 /ПАССИВНАЯ РЕКЛАМА -->
+<!-- /ADS -->
 
 </body></html>
   `);
@@ -1398,4 +1382,14 @@
         scanBtn.classList.remove("disabled");
         scanBtn.innerHTML = `<span class="icon">👁‍🗨</span><span>СКАНИРОВАТЬ</span>`;
         setStatus("демо-результаты получены");
-        showResult
+        showResults(q);
+        openProfileWindowInto(profileWin, q);
+      }, 900);
+    }
+
+    typeButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const t = btn.getAttribute("data-type");
+        if (!t || t === currentType) return;
+        renderType(t);
+        setStatus("тип поиска изменён, ожидаем новый запр
